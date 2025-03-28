@@ -8,7 +8,8 @@ function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const cart = useSelector(state => state.cart.items);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-    const [addedToCart, setAddedToCart] = useState({});
+    //const [addedToCart, setAddedToCart] = useState({});
+    const [addedToCart, setAddedToCart] = useState([]);
 
     const plantsArray = [
         {
@@ -239,13 +240,15 @@ function ProductList({ onHomeClick }) {
     }
 
     const total_cart_value = cart.length;
+
     const handleAddToCart = (product) => {
         dispatch(addItem(product));
-        setAddedToCart((prevState) => ({
-           ...prevState,
-           [product.name]: true, // Set the product name as key and value as true to indicate it's added to cart
-         }));
+        setAddedToCart((prev) => [...prev, product.name]); 
       };
+
+      const AddToCartBtnDisabled = (productName) => {
+        return Array.isArray(addedToCart) && addedToCart.includes(productName); // ✅ Check array safely
+    };
 
     const handleHomeClick = (e) => {
         e.preventDefault();
@@ -330,7 +333,15 @@ function ProductList({ onHomeClick }) {
                                         <img className="product-image" src={plant.image} alt={plant.name} />
                                         <div className="product-title">{plant.name}</div>
                                         {/*Similarly like the above plant.name show other details like description and cost*/}
-                                        <button className="product-button" onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                                        {AddToCartBtnDisabled(plant.name) ? (
+                                        <button className='product-button added-to-cart'>
+                                            Added to Cart
+                                        </button>
+                                    ) : (
+                                        <button className='product-button'
+                                                onClick={() => handleAddToCart(plant)}>
+                                            Add to Cart
+                                        </button>)}
                                     </div>
                                 ))}
                             </div>
